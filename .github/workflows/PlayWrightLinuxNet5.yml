@@ -10,6 +10,8 @@ env:
   DOTNET_CORE_VERSION: 5.0.x
   WORKING_DIRECTORY: PlayWrightLinuxNet5
   DOTNET_CORE_VERSION_INPROC: 3.1.x
+  # download playwright browser to our app's folder, not ~/.cache/ms-playwright
+  PLAYWRIGHT_BROWSERS_PATH: PlayWrightLinuxNet5/publish/.playwright/ms-playwright
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -26,6 +28,11 @@ jobs:
         include-prerelease: True
     - name: Restore
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+    - name: Build and Playwright Install
+      shell: bash
+      run: |
+        dotnet tool install --global Microsoft.Playwright.CLI
+        playwright install chromium
     - name: Build
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Publish
