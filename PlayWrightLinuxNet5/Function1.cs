@@ -18,9 +18,6 @@ namespace PlayWrightLinuxNet5
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             var response = req.CreateResponse(HttpStatusCode.OK);
-            response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
-            //response.WriteString("Welcome to Azure Functions!");
 
             log.LogInformation("Sac starting playwright");
 
@@ -28,9 +25,12 @@ namespace PlayWrightLinuxNet5
             await using var browser = await playwright.Chromium.LaunchAsync();
             var page = await browser.NewPageAsync();
             await page.GotoAsync("https://playwright.dev/dotnet");
+            var screenshot = await page.ScreenshotAsync();
 
             log.LogInformation("Sac playwright end");
 
+            response.Headers.Add("Content-Type", "image/png");
+            response.WriteBytes(await page.ScreenshotAsync());
             return response;
         }
     }
